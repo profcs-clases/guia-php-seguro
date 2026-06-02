@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 2: Base de Datos | PHP Profesional</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle">🌙</button>
+    <aside class="sidebar">
+        <h2>🛡️ PHP Seguro</h2>
+        <nav>
+            <a href="index.html">1. Anatomía del Proyecto</a>
+            <a href="base-datos.html">2. Base de Datos (PDO)</a>
+            <a href="seguridad.html">3. Seguridad y Autenticación</a>
+            <a href="arquitectura.html">4. Arquitectura y Extras</a>
+            <a href="recursos.html">5. Checklist y Recursos</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1>Módulo 2: Conexión a Base de Datos con PDO</h1>
+        
+        <h2>2.1 ¿PDO o MySQLi?</h2>
+        <p>Ambos son seguros si se usan correctamente, pero <strong>PDO es el estándar profesional</strong> moderno.</p>
+        <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+            <tr style="background: var(--bg-secondary);"><th style="padding:0.5rem; text-align:left;">Característica</th><th style="padding:0.5rem; text-align:left;">PDO</th><th style="padding:0.5rem; text-align:left;">MySQLi</th></tr>
+            <tr><td style="padding:0.5rem;">Soporte de BD</td><td style="padding:0.5rem;">12+ (MySQL, PostgreSQL, SQLite, etc.)</td><td style="padding:0.5rem;">Solo MySQL/MariaDB</td></tr>
+            <tr><td style="padding:0.5rem;">Parámetros nombrados</td><td style="padding:0.5rem;">✅ Sí (<code>:nombre</code>)</td><td style="padding:0.5rem;">❌ No (solo <code>?</code>)</td></tr>
+            <tr><td style="padding:0.5rem;">Orientado a Objetos</td><td style="padding:0.5rem;">✅ 100% Nativo</td><td style="padding:0.5rem;">⚠️ Híbrido (Procedural y OO)</td></tr>
+        </table>
+
+        <h2>2.2 El Patrón Singleton para la Conexión</h2>
+        <p>Evita abrir múltiples conexiones innecesarias. Garantiza una única instancia de la base de datos en toda la aplicación.</p>
+        <pre><code class="language-php">class Database {
+    private static $instance = null;
+    private $pdo;
+
+    private function __construct() {
+        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false, // ⚠️ CRUCIAL: Desactiva emulación para seguridad real
+        ];
+        $this->pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+    }
+
+    public static function getInstance() {
+        if (self::$instance === null) self::$instance = new self();
+        return self::$instance;
+    }
+    
+    public function query($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    }
+}</code></pre>
+
+        <div class="hack-case">
+            <h4>🕵️‍♂️ Caso de Hackeo: SQL Injection Clásico</h4>
+            <p>Si concatenas strings: <code>"SELECT * FROM users WHERE id = " . $_GET['id']</code></p>
+            <p>Un atacante envía: <code>?id=1 OR 1=1</code>. La consulta se convierte en <code>SELECT * FROM users WHERE id = 1 OR 1=1</code>, devolviendo <strong>todos</strong> los usuarios.</p>
+        </div>
+
+        <div class="defense">
+            <h4>🛡️ La Defensa: Consultas Preparadas</h4>
+            <p>PDO separa la estructura de la consulta de los datos. El motor de BD compila el SQL primero y luego inserta los datos como valores literales, no como código ejecutable.</p>
+            <pre><code class="language-php">// FORMA SEGURA
+$db = Database::getInstance();
+$stmt = $db->query("SELECT * FROM users WHERE email = :email", ['email' => $_POST['email']]);
+$user = $stmt->fetch();</code></pre>
+        </div>
+
+        <h2>2.3 Transacciones (Commit / Rollback)</h2>
+        <p>Esencial para operaciones que modifican múltiples tablas (ej: registrar usuario y su perfil). Si una falla, se deshace todo.</p>
+        <pre><code class="language-php">try {
+    $pdo->beginTransaction();
+    $pdo->query("INSERT INTO users (name) VALUES (?)", ['Juan']);
+    $pdo->query("INSERT INTO profiles (user_id, bio) VALUES (?, ?)", [1, 'Dev']);
+    $pdo->commit();
+} catch (Exception $e) {
+    $pdo->rollBack(); // Deshace los cambios si algo falla
+    error_log("Error en transacción: " . $e->getMessage());
+}</code></pre>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

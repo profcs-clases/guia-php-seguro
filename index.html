@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 1: Anatomía del Proyecto | PHP Profesional</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle">🌙</button>
+    
+    <aside class="sidebar">
+        <h2>🛡️ PHP Seguro</h2>
+        <nav>
+            <a href="index.html">1. Anatomía del Proyecto</a>
+            <a href="base-datos.html">2. Base de Datos (PDO)</a>
+            <a href="seguridad.html">3. Seguridad y Autenticación</a>
+            <a href="arquitectura.html">4. Arquitectura y Extras</a>
+            <a href="recursos.html">5. Checklist y Recursos</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1>Módulo 1: Anatomía de un Proyecto PHP Profesional</h1>
+        <p>Olvida el "todo en un solo archivo". Un proyecto real requiere separación de responsabilidades, mantenibilidad y un punto de entrada único.</p>
+
+        <h2>1.1 El Patrón Front Controller</h2>
+        <p>Todas las solicitudes HTTP pasan por un único archivo (<code>public/index.php</code>). Este archivo inicializa la configuración, la conexión a la base de datos y enruta la petición al controlador adecuado.</p>
+        
+        <pre><code class="language-php">// public/index.php
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../app/Models/Database.php';
+
+// Enrutamiento básico
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// ... lógica de router ...</code></pre>
+
+        <h2>1.2 Estructura de Carpetas Recomendada</h2>
+        <ul>
+            <li><code>/public</code>: Único directorio accesible desde la web. Contiene <code>index.php</code>, CSS, JS e imágenes.</li>
+            <li><code>/app</code>: Lógica de la aplicación. Nadie debe acceder aquí directamente vía web.
+                <ul>
+                    <li><code>Controllers/</code>: Reciben la petición, validan datos y llaman al Modelo.</li>
+                    <li><code>Models/</code>: Entidades y lógica de acceso a datos (CRUD).</li>
+                    <li><code>Views/</code>: Archivos .php o .twig con HTML puro (sin lógica de negocio).</li>
+                </ul>
+            </li>
+            <li><code>/config</code>: Variables de entorno y configuración global.</li>
+            <li><code>/storage</code>: Logs de errores y archivos subidos por usuarios (fuera de <code>/public</code>).</li>
+        </ul>
+
+        <h2>1.3 Convenciones PSR</h2>
+        <p><strong>PSR-1:</strong> Las clases usan <code>UpperCamelCase</code>, los métodos <code>lowerCamelCase</code>.<br>
+        <strong>PSR-4:</strong> Autoloading. La estructura de carpetas debe reflejar los <code>Namespaces</code>. Ej: <code>App\Models\User</code> vive en <code>app/Models/User.php</code>.</p>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

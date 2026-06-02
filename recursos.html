@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 5: Recursos | PHP Profesional</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle">🌙</button>
+    <aside class="sidebar">
+        <h2>🛡️ PHP Seguro</h2>
+        <nav>
+            <a href="index.html">1. Anatomía del Proyecto</a>
+            <a href="base-datos.html">2. Base de Datos (PDO)</a>
+            <a href="seguridad.html">3. Seguridad y Autenticación</a>
+            <a href="arquitectura.html">4. Arquitectura y Extras</a>
+            <a href="recursos.html">5. Checklist y Recursos</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1>Módulo 5: Checklist de Despliegue y Recursos</h1>
+        <p>Antes de subir tu proyecto a producción, revisa esta lista. Puedes imprimir esta página (Ctrl+P).</p>
+
+        <h2>✅ Checklist de Seguridad para Producción</h2>
+        <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+            <label class="checklist-item" style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; cursor: pointer;">
+                <input type="checkbox"> <span>Las credenciales de la BD no están hardcodeadas ni en el repositorio Git.</span>
+            </label>
+            <label class="checklist-item" style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; cursor: pointer;">
+                <input type="checkbox"> <span>Se usa <code>password_hash()</code> con Argon2id o Bcrypt para todas las contraseñas.</span>
+            </label>
+            <label class="checklist-item" style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; cursor: pointer;">
+                <input type="checkbox"> <span>Todas las consultas a la BD usan Prepared Statements (PDO).</span>
+            </label>
+            <label class="checklist-item" style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; cursor: pointer;">
+                <input type="checkbox"> <span>Todos los formularios POST incluyen y validan un token CSRF.</span>
+            </label>
+            <label class="checklist-item" style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; cursor: pointer;">
+                <input type="checkbox"> <span>Toda salida de datos del usuario a HTML usa <code>htmlspecialchars()</code>.</span>
+            </label>
+            <label class="checklist-item" style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; cursor: pointer;">
+                <input type="checkbox"> <span><code>display_errors</code> está en <code>0</code> y <code>log_errors</code> en <code>1</code> en producción.</span>
+            </label>
+            <label class="checklist-item" style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; cursor: pointer;">
+                <input type="checkbox"> <span>La carpeta de uploads tiene restricciones de tipo de archivo (.htaccess o validación PHP) y no permite ejecución de scripts.</span>
+            </label>
+            <label class="checklist-item" style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; cursor: pointer;">
+                <input type="checkbox"> <span>Se llama a <code>session_regenerate_id(true)</code> después de un login exitoso.</span>
+            </label>
+        </div>
+
+        <h2>📚 Glosario Rápido</h2>
+        <ul style="color: var(--text-secondary); line-height: 1.8;">
+            <li><strong>Front Controller:</strong> Patrón donde una sola entrada (index.php) maneja todas las peticiones.</li>
+            <li><strong>SQL Injection (SQLi):</strong> Inyección de código SQL malicioso a través de inputs no sanitizados.</li>
+            <li><strong>XSS (Cross-Site Scripting):</strong> Inyección de scripts maliciosos en páginas web vistas por otros usuarios.</li>
+            <li><strong>CSRF:</strong> Engañar a un usuario autenticado para que ejecute acciones no deseadas.</li>
+            <li><strong>Salting:</strong> Añadir datos aleatorios a una contraseña antes de hashearla para evitar ataques de diccionario (PHP lo hace automático en <code>password_hash</code>).</li>
+        </ul>
+
+        <h2>🛠️ Herramientas Recomendadas</h2>
+        <ul style="color: var(--text-secondary); line-height: 1.8;">
+            <li><strong>Composer:</strong> Gestor de dependencias de PHP (imprescindible para proyectos reales).</li>
+            <li><strong>PHPStan / Psalm:</strong> Analizadores estáticos de código para encontrar errores antes de ejecutar.</li>
+            <li><strong>Xdebug:</strong> Extensión para depuración paso a paso y análisis de rendimiento.</li>
+            <li><strong>Postman / Insomnia:</strong> Para probar APIs y endpoints sin depender del frontend.</li>
+        </ul>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

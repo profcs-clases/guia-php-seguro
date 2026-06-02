@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 4: Arquitectura | PHP Profesional</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle">🌙</button>
+    <aside class="sidebar">
+        <h2>🛡️ PHP Seguro</h2>
+        <nav>
+            <a href="index.html">1. Anatomía del Proyecto</a>
+            <a href="base-datos.html">2. Base de Datos (PDO)</a>
+            <a href="seguridad.html">3. Seguridad y Autenticación</a>
+            <a href="arquitectura.html">4. Arquitectura y Extras</a>
+            <a href="recursos.html">5. Checklist y Recursos</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1>Módulo 4: Arquitectura por Capas y Temas Avanzados</h1>
+
+        <h2>4.1 Flujo MVC Simplificado</h2>
+        <ol style="margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-secondary);">
+            <li><strong>Router:</strong> <code>index.php</code> recibe <code>/usuarios/crear</code>.</li>
+            <li><strong>Controlador:</strong> <code>UserController.php</code> recibe la petición, valida el CSRF y los datos del POST.</li>
+            <li><strong>Modelo:</strong> Llama a <code>UserModel->create($data)</code> para interactuar con PDO.</li>
+            <li><strong>Vista:</strong> El controlador carga <code>views/usuarios/crear.php</code> pasando solo los datos necesarios para pintar.</li>
+        </ol>
+
+        <h2>4.2 Control de Acceso por Roles (Middleware)</h2>
+        <p>Un "Middleware" es un código que se ejecuta <em>antes</em> de llegar al controlador principal.</p>
+        <pre><code class="language-php">// app/Middleware/AuthMiddleware.php
+function requireRole($allowedRoles) {
+    session_start();
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: /login.php");
+        exit;
+    }
+    if (!in_array($_SESSION['role'], $allowedRoles)) {
+        http_response_code(403);
+        die("Acceso denegado: No tienes permisos suficientes.");
+    }
+}
+
+// Uso en el Controlador:
+requireRole(['admin', 'editor']);
+// ... resto de la lógica del controlador ...</code></pre>
+
+        <h2>4.3 Depuración Profesional (Debugging)</h2>
+        <p>En producción, <strong>nunca</strong> muestres errores al usuario. Usa logs.</p>
+        <pre><code class="language-php">// config.php (Producción)
+ini_set('display_errors', 0); // No mostrar en pantalla
+ini_set('log_errors', 1);     // Guardar en archivo
+ini_set('error_log', __DIR__ . '/../storage/logs/php_errors.log');
+
+// En tu código, atrapa excepciones y logéalas:
+try {
+    // código riesgoso
+} catch (PDOException $e) {
+    error_log("Fallo en BD: " . $e->getMessage() . " en " . $e->getFile());
+    // Mostrar mensaje amigable al usuario
+    echo "Ocurrió un error inesperado. Nuestro equipo ha sido notificado.";
+}</code></pre>
+
+        <div class="info-banner">
+            <h4>ℹ️ Sección de Cultura Profesional (Informativa)</h4>
+            <p><em>Los siguientes temas no son parte de la evaluación obligatoria del curso, pero dominarlos te dará una ventaja competitiva masiva en tu primer empleo:</em></p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
+                <li><strong>Git Workflow:</strong> Nunca trabajes en la rama <code>main</code>. Crea <code>feature/nombre-funcionalidad</code>, haz commits atómicos y usa Pull Requests.</li>
+                <li><strong>Variables de Entorno (.env):</strong> Nunca subas <code>config.php</code> con contraseñas a GitHub. Usa librerías como <code>vlucas/phpdotenv</code> para cargar credenciales desde un archivo <code>.env</code> que está en <code>.gitignore</code>.</li>
+                <li><strong>Testing Básico:</strong> Usa la función nativa <code>assert()</code> para validar que tus funciones devuelven lo esperado antes de desplegar. <code>assert(calcularTotal(10, 5) === 15);</code></li>
+                <li><strong>2FA (Autenticación de Dos Factores):</strong> Para sistemas críticos, implementa TOTP (códigos de 6 dígitos tipo Google Authenticator) usando librerías como <code>spomky-labs/otphp</code>.</li>
+            </ul>
+        </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
